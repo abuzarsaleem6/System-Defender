@@ -583,7 +583,7 @@ void updateGameLogic(float dt, Spaceship& ship, Spaceship& assistShip, Boss& big
                 lasers[i].active = false;
                 bigBoss.hp -= 10; // Damage the boss
 
-                // --- BOSS HIT ANIMATION (KEPT AS REQUESTED) ---
+                // --- BOSS HIT ANIMATION (KEPT) ---
                 SpawnExplosion(lasers[i].x - 15, lasers[i].y, explosions);
                 // ------------------------------------
 
@@ -607,7 +607,7 @@ void updateGameLogic(float dt, Spaceship& ship, Spaceship& assistShip, Boss& big
                     enemies[j].active = false;
                     enemies_killed++;
 
-                    // --- SCORE IS 10 (KEPT AS REQUESTED) ---
+                    // --- SCORE IS 10 (KEPT) ---
                     score += 10;
                     // --------------------------------
 
