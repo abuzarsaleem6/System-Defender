@@ -857,6 +857,17 @@ void DrawGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemi
 		DrawText("PRESS [ENTER]", 250, 550, 20, GRAY);
 	}
 }
+void DrawTransition(Spaceship& ship) {
+	if (level == 11) { DrawText("WARNING! BOSS DETECTED", 300, 320, 30, RED); }
+	else {
+		DrawText("SECTOR CLEARED", 280, 300, 40, GREEN);
+		DrawText(TextFormat("NEXT LEVEL: % d", level), 320, 400, 30, YELLOW);
+	}
+	Rectangle playerSource = { 0.0f, 0.0f, (float)playerTexture.width, (float)playerTexture.height
+	};
+	Rectangle playerDest = { ship.x, ship.y, ship.width, ship.height };
+	DrawTexturePro(playerTexture, playerSource, playerDest, { 0,0 }, 0.0f, WHITE);
+}
 
 
 
