@@ -782,6 +782,8 @@ void updateExplosions(float dt, Explosion explosions[]) {
 
 
 
+
+
 void DrawGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser
     lasers[], BossLaser bossLasers[], Explosion explosions[]) {
     BeginDrawing();
