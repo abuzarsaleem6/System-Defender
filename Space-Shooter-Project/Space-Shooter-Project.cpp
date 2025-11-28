@@ -116,6 +116,9 @@ void DrawGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemi
 	lasers[], BossLaser bossLasers[], Explosion explosions[]);
 
 void DrawTransition(Spaceship& ship);
+void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser
+	lasers[], BossLaser bossLasers[], Explosion explosions[]);
+void DrawMenu(void);
 
 	
 	
