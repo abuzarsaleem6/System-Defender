@@ -214,10 +214,10 @@ int main() {
                 state_game_over || current_game_state == state_game_won) {
                 handleMenuInput();
             }
-            // Main loop ke andar is part ko dhoonden aur replace karein:
+           
             if (gameRunning && current_game_state != State_paused) {
                 if (inTransition) {
-                    // Yahan naya function call ayega:
+                    
                     handleLevelTransition(ship, bigBoss, enemies, lasers, bossLasers, explosions);
                 }
                 else {
