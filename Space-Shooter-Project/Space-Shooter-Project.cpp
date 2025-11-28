@@ -940,7 +940,7 @@ void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy e
     for (int i = 0; i < max_enemies; i++) {
         if (enemies[i].active) {
             Rectangle enemyDest = { enemies[i].x, enemies[i].y, enemies[i].width, enemies[i].height };
-            // Tint Red if damaged (for hard enemies)
+            
             Color tint = WHITE;
             if (enemies[i].maxHp > 1 && enemies[i].hp < enemies[i].maxHp) tint = RED;
             DrawTexturePro(enemyTexture, enemySource, enemyDest, { 0,0 }, 0.0f, tint);
