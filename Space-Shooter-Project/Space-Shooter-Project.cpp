@@ -4,7 +4,7 @@
 #include<cstdlib>
 using namespace std;
 
-//----Constants 
+// Constants 
 const int window_height = 900;
 const int window_width = 1000;
 const int star_count = 200;
@@ -14,7 +14,7 @@ const int max_enemies = 50;
 const int explosion_frames_number = 5;
 const int max_explosions = 20;
 
-// --- GAME STATES & TRANSITIONS --- 
+// GAME STATES & TRANSITIONS 
 const int state_title = 0;
 const int state_instructions = 1;
 const int State_paused = 2;
@@ -28,7 +28,7 @@ const int Transition_to_title = 3;
 const int Transition_to_resume = 4;
 const int Transition_quit_to_title = 5;
 
-//--Structs
+// Structs
 struct star {
     float x, y;
     float speed;
@@ -78,7 +78,7 @@ struct Explosion {
 };
 
 
-// --- GLOBAL VARIABLES --- 
+//  GLOBAL VARIABLES 
 int score = 0, highScore = 0, level = 1, lives = 3;
 bool gameRunning = false, inTransition = false, gameWon = false, exitGameRequest = false;
 float transitionTimer = 0.0f, shootCooldown = 0.2f, shootTimer = 0.0f, frameWidth;
@@ -93,14 +93,14 @@ bool isFading_out = false;
 int pendingTransition = Transition_none;
 
 
-// --- OBJECTS & ASSETS --- 
+//  OBJECTS & ASSETS 
 star stars[star_count];
 Texture2D playerTexture, enemyTexture, laserTexture, explosionTexture, assistTexture,
 bossTexture, bossLaserTexture;
 Sound shootSound, explosionSound;
 
 
-// --- PROTOTYPE DECLERATION --- 
+//  PROTOTYPE DECLERATION 
 void loadAssets(void);
 void unloadAllAssets(void);
 void loadHighScore(void);
@@ -200,7 +200,7 @@ int main() {
         explosions[i].currentFrame = 0;
         explosions[i].frameTimer = 0.0f;
     }
-    // -------------------------------------------
+    
         // MAIN GAME LOOP 
     while (!WindowShouldClose() && !exitGameRequest) {
         float dt = GetFrameTime();
@@ -569,12 +569,12 @@ void updateGameLogic(float dt, Spaceship& ship, Spaceship& assistShip, Boss& big
 
     //  COLLISION LOGIC (Player Lasers vs Enemies/Boss)
 
-    Rectangle playerRect = { ship.x, ship.y, ship.width, ship.height }; // Re-define for scope safety
+    Rectangle playerRect = { ship.x, ship.y, ship.width, ship.height }; 
 
     for (int i = 0; i < max_lasers; i++) {
         if (!lasers[i].active) continue;
 
-        Rectangle laserRect = { lasers[i].x, lasers[i].y, 20, 60 }; // Hardcoded size based on your draw logic
+        Rectangle laserRect = { lasers[i].x, lasers[i].y, 20, 60 }; 
 
         // Laser vs Boss
         if (level == 11 && bigBoss.active) {
@@ -583,9 +583,9 @@ void updateGameLogic(float dt, Spaceship& ship, Spaceship& assistShip, Boss& big
                 lasers[i].active = false;
                 bigBoss.hp -= 10; // Damage the boss
 
-                // --- BOSS HIT ANIMATION (KEPT) ---
+                // BOSS HIT ANIMATION 
                 SpawnExplosion(lasers[i].x - 15, lasers[i].y, explosions);
-                // ------------------------------------
+                
 
                 if (bigBoss.hp <= 0) {
                     bigBoss.active = false;
@@ -607,9 +607,9 @@ void updateGameLogic(float dt, Spaceship& ship, Spaceship& assistShip, Boss& big
                     enemies[j].active = false;
                     enemies_killed++;
 
-                    // --- SCORE IS 10 (KEPT) ---
+                    //  SCORE IS 10 (KEPT) 
                     score += 10;
-                    // --------------------------------
+                    
 
                     PlaySound(explosionSound);
 
