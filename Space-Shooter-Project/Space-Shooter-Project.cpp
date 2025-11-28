@@ -234,7 +234,7 @@ int main() {
     CloseAudioDevice();
     CloseWindow();
     return 0;
-}
+} 
 
 
 void loadAssets(void) {
