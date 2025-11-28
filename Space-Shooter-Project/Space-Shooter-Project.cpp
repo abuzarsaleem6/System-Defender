@@ -662,7 +662,7 @@ void updateGameLogic(float dt, Spaceship& ship, Spaceship& assistShip, Boss& big
 
 
 void updateEnemyLogic(Spaceship& ship, Enemy enemies[]) {
-    // Code 2 Logic adapted for Code 1 Variables
+    
     int max_enemies_on_screen = (level == 11) ? 0 : (5 + level * 2);
     if (max_enemies_on_screen > max_enemies) max_enemies_on_screen = max_enemies;
 
@@ -681,11 +681,7 @@ void updateEnemyLogic(Spaceship& ship, Enemy enemies[]) {
 
                     // Speed increases slightly every level
                     enemies[i].speed = 1.0f + ((level - 1) * 0.1f);
-
-                    // Level 7+ enemies have 2 HP (Harder)
-                    if (level <= 6) { enemies[i].hp = 1; enemies[i].maxHp = 1; }
-                    else { enemies[i].hp = 2; enemies[i].maxHp = 2; }
-
+               
                     enemies_spawned_count++;
                     if (enemies_spawned_count >= enemies_to_Kill) break;
                 }
