@@ -391,7 +391,6 @@ void handleMenuInput(void) {
         }
     }
 }
-
 void handlePlayerInput(Spaceship& ship, Spaceship& assistShip, Laser lasers[]) {
     float dt = GetFrameTime();
 
