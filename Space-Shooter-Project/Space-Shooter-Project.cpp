@@ -4,7 +4,7 @@
 #include<cstdlib>
 using namespace std;
 
-	//----Constans 
+	//----Constants 
 	const int window_height = 1000;
 	const int window_width = 1000;
 	const int star_count = 200;
@@ -18,7 +18,7 @@ using namespace std;
 	const int state_instructions = 1;
 	const int State_paused = 2;
 	const int state_game_over = 3;
-	const int state_ganme_won = 4;
+	const int state_game_won = 4;
 
 	const int Transition_none = 0;
 	const int Transition_at_gamestart = 1;
