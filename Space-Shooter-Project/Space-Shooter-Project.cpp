@@ -817,5 +817,46 @@ void DrawGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemi
 	if (pendingTransition != Transition_none) DrawRectangle(0, 0, window_width,
 		window_height, Fade(BLACK, fadeAlpha));
 	EndDrawing();
+}void DrawMenu(void) {
+	if (current_game_state == state_title) {
+		Rectangle rec = { window_width / 2.0f, window_height / 2.0f, 600, 500 };
+		Vector2 origin = { 300, 250 };
+		DrawRectanglePro(rec, origin, -5.0f, Fade(DARKGRAY, 0.9f));
+		DrawText("SPACE SHOOTER", 100, 100, 50, MAGENTA);
+		DrawText("MAIN MENU", 600, 100, 40, MAGENTA);
+
+		int startY = 300, spacing = 50;
+		Color c0 = (menu_selection == 0) ? GREEN : MAGENTA;
+		DrawText("START NEW GAME", window_width / 2 - 150, startY, 30, c0);
+		if (menu_selection == 0) DrawText(">", window_width / 2 - 180, startY, 30, GREEN);
+
+		Color c1 = (menu_selection == 1) ? GREEN : MAGENTA;
+		DrawText("INSTRUCTIONS", window_width / 2 - 150, startY + spacing, 30, c1);
+		if (menu_selection == 1) DrawText(">", window_width / 2 - 180, startY + spacing, 30, GREEN);
+
+		DrawText(TextFormat("STATS (HIGH: %d)", highScore), window_width / 2 - 150, startY +
+			spacing * 2, 30, GRAY);
+
+		Color c2 = (window_width == 2) ? GREEN : MAGENTA;
+		DrawText("QUIT GAME", window_width / 2 - 150, startY + spacing * 3, 30, c2);
+		if (window_width == 2) DrawText(">", window_width / 2 - 180, startY + spacing * 3, 30,
+			GREEN);
+	}
+	else if (current_game_state == state_instructions) {
+		DrawRectangle(100, 100, window_width - 200, window_height - 200,
+			Fade(DARKGRAY, 0.9f));
+		DrawRectangleLines(100, 100, window_width - 200, window_height - 200, WHITE);
+		DrawText("SYSTEM DEFENDER: INSTRUCTIONS", 150, 150, 30, SKYBLUE);
+		DrawText("MOVEMENT: ARROWS | SHOOT: SPACE | ASSIST: H", 150, 250, 20, WHITE);
+		DrawText("Press [ENTER] to return", 150, 720, 20, GREEN);
+	}
+	// ... (Add Paused, Victory, Game Over screens from original code here) 
+	else if (current_game_state == state_game_over) {
+		DrawText("GAME OVER", 300, 300, 60, RED);
+		DrawText(TextFormat("SCORE: %d", score), 350, 400, 20, WHITE);
+		DrawText("PRESS [ENTER]", 250, 550, 20, GRAY);
+	}
 }
+
+
 
