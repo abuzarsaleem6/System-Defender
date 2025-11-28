@@ -1,16 +1,18 @@
 ﻿  Space-Shooter-Project.cpp
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(91,20): warning C4101: 'explosionSound': unreferenced local variable
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(90,3): warning C4101: 'bossTexture': unreferenced local variable
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(89,41): warning C4101: 'laserTexture': unreferenced local variable
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(89,73): warning C4101: 'assistTexture': unreferenced local variable
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(89,12): warning C4101: 'playerTexture': unreferenced local variable
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(90,16): warning C4101: 'bossLaserTexture': unreferenced local variable
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(89,55): warning C4101: 'explosionTexture': unreferenced local variable
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(80,73): warning C4101: 'frameWidth': unreferenced local variable
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(88,7): warning C4101: 'stars': unreferenced local variable
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(91,8): warning C4101: 'shootSound': unreferenced local variable
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(89,27): warning C4101: 'enemyTexture': unreferenced local variable
-C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(93,5): error C2084: function 'int main(void)' already has a body
-      C:\Users\abdul\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(6,5):
-      see previous definition of 'main'
-  
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(123,34): error C2065: 'WINDOW_WIDTH': undeclared identifier
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(124,34): error C2065: 'WINDOW_HEIGHT': undeclared identifier
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(171,3): error C3861: 'UpdateStars': identifier not found
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(173,3): error C3861: 'HandleTransitions': identifier not found
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(176,24): error C2065: 'currentGameState': undeclared identifier
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(176,60): error C2065: 'currentGameState': undeclared identifier
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(177,24): error C2065: 'currentGameState': undeclared identifier
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(177,44): error C2065: 'STATE_VICTORY': undeclared identifier
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(178,5): error C3861: 'HandleMenuInput': identifier not found
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(180,23): error C2065: 'currentGameState': undeclared identifier
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(180,43): error C2065: 'STATE_PAUSED': undeclared identifier
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(181,23): error C3861: 'HandleLevelTransition': identifier not found
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(183,6): error C3861: 'HandlePlayerInput': identifier not found
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(184,6): error C3861: 'UpdateGameLogic': identifier not found
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(189,3): error C3861: 'DrawGame': identifier not found
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(190,34): error C3861: 'SaveHighScore': identifier not found
+C:\Users\PC\source\repos\Space-Shooter-Project\Space-Shooter-Project\Space-Shooter-Project.cpp(244,2): error C3861: 'StartLevel': identifier not found
