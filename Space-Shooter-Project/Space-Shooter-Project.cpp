@@ -869,5 +869,44 @@ void DrawTransition(Spaceship& ship) {
 	DrawTexturePro(playerTexture, playerSource, playerDest, { 0,0 }, 0.0f, WHITE);
 }
 
+void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser
+	lasers[], BossLaser bossLasers[], Explosion explosions[]) {
+	// Lasers 
+	Rectangle laserSource = { 0.0f, 0.0f, (float)laserTexture.width, (float)laserTexture.height };
+	for (int i = 0; i < max_lasers; i++) {
+		if (lasers[i].active) {
+			Rectangle laserDest = { lasers[i].x, lasers[i].y, 20, 60 };
+			DrawTexturePro(laserTexture, laserSource, laserDest, { 0,0 }, 0.0f, WHITE);
+		}
+	}
+	// Boss & Boss Lasers 
+	if (level == 11 && bigBoss.active) {
+		Rectangle bossSource = { 0.0f, 0.0f, (float)bossTexture.width, (float)bossTexture.height };
+		Rectangle bossDest = { bigBoss.x, bigBoss.y, bigBoss.width, bigBoss.height };
+		DrawTexturePro(bossTexture, bossSource, bossDest, { 0,0 }, 0.0f, (bigBoss.hp <
+			bigBoss.maxHp && GetRandomValue(0, 10)>8) ? RED : WHITE);
+		// ... (Draw Boss Lasers and Health Bar here) 
+	}
+	// Enemies 
+	Rectangle enemySource = { 0.0f, 0.0f, (float)enemyTexture.width, (float)enemyTexture.height
+	};
+	for (int i = 0; i < max_enemies; i++) {
+		if (enemies[i].active) {
+			Rectangle enemyDest = { enemies[i].x, enemies[i].y, enemies[i].width, enemies[i].height
+			};
+			DrawTexturePro(enemyTexture, enemySource, enemyDest, { 0,0 }, 0.0f, (enemies[i].hp
+				< enemies[i].maxHp) ? RED : WHITE);
+		}
+	}
+	// Player 
+	Rectangle playerSource = { 0.0f, 0.0f, (float)playerTexture.width, (float)playerTexture.height
+	};
+	Rectangle playerDest = { ship.x, ship.y, ship.width, ship.height };
+	DrawTexturePro(playerTexture, playerSource, playerDest, { 0,0 }, 0.0f, WHITE);
+
+	// UI HUD 
+	DrawText(TextFormat("SCORE: %d", score), 20, 20, 20, GREEN);
+	DrawText(TextFormat("LIVES: %d", lives), 20, 110, 20, RED);
+}
 
 
