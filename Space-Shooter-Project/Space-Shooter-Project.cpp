@@ -624,3 +624,182 @@ void handleTransitions(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, En
 		}
 	}
 }
+
+void updateGameLogic(float dt, Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser lasers[], BossLaser bossLasers[], Explosion explosions[]) {
+	// Laser Movement
+	for (int i = 0; i < max_lasers; i++) {
+		if (lasers[i].active) {
+			lasers[i].y -= lasers[i].speed;
+			if (lasers[i].y < 0) lasers[i].active = false;
+		}
+	}
+
+	//  Boss Logic
+	if (level == 11 && bigBoss.active) {
+		if (bigBoss.entering) {
+			bigBoss.y += 1.0f;
+			if (bigBoss.y >= 50) bigBoss.entering = false;
+		}
+		else {
+			bigBoss.x += bigBoss.speed * bigBoss.moveDir;
+
+			// Boundary checks
+			if (bigBoss.x <= 0) bigBoss.moveDir = 1;
+			if (bigBoss.x + bigBoss.width >= window_width) bigBoss.moveDir = -1;
+
+			bigBoss.shootTimer -= dt;
+			if (bigBoss.shootTimer <= 0.0f) {
+				for (int i = 0; i < max_boss_lasers; i++) {
+					if (!bossLasers[i].active) {
+						bossLasers[i].active = true;
+						bossLasers[i].x = bigBoss.x + bigBoss.width / 2 - 10;
+						bossLasers[i].y = bigBoss.y + bigBoss.height;
+						break;
+					}
+				}
+				bigBoss.shootTimer = 0.8f;
+			}
+		}
+
+		// BOSS COLLISIONS 
+
+		Rectangle playerRect = { ship.x, ship.y, ship.width, ship.height };
+		Rectangle bossRect = { bigBoss.x, bigBoss.y, bigBoss.width, bigBoss.height };
+
+		//  Boss Body vs Player
+		if (CheckCollisionRecs(playerRect, bossRect)) {
+			lives--;
+			PlaySound(explosionSound);
+			ship.x = window_width / 2 - ship.width / 2; // Reset player position
+			ship.y = window_height - 100;
+			if (lives <= 0) {
+				current_game_state = state_game_over;
+				gameRunning = false;
+			}
+		}
+
+		//  Boss Lasers vs Player
+		for (int i = 0; i < max_boss_lasers; i++) {
+			if (bossLasers[i].active) {
+				// Moving Boss Lasers
+				bossLasers[i].y += bossLasers[i].speed;
+				if (bossLasers[i].y > window_height) bossLasers[i].active = false;
+
+				// Check Collision
+				Rectangle laserRect = { bossLasers[i].x, bossLasers[i].y, bossLasers[i].width, bossLasers[i].height };
+				if (CheckCollisionRecs(playerRect, laserRect)) {
+					bossLasers[i].active = false;
+					lives--;
+					PlaySound(explosionSound);
+					if (lives <= 0) {
+						current_game_state = state_game_over;
+						gameRunning = false;
+					}
+				}
+			}
+		}
+	}
+
+	updateEnemyLogic(ship, enemies);
+	updateExplosions(dt, explosions);
+
+	//  COLLISION LOGIC (Player Lasers vs Enemies/Boss)
+
+	Rectangle playerRect = { ship.x, ship.y, ship.width, ship.height }; // Re-define for scope safety
+
+	for (int i = 0; i < max_lasers; i++) {
+		if (!lasers[i].active) continue;
+
+		Rectangle laserRect = { lasers[i].x, lasers[i].y, 20, 60 }; // Hardcoded size based on your draw logic
+
+		// Laser vs Boss
+		if (level == 11 && bigBoss.active) {
+			Rectangle bossRect = { bigBoss.x, bigBoss.y, bigBoss.width, bigBoss.height };
+			if (CheckCollisionRecs(laserRect, bossRect)) {
+				lasers[i].active = false;
+				bigBoss.hp -= 10; // Damage the boss
+				if (bigBoss.hp <= 0) {
+					bigBoss.active = false;
+					score += 1000;
+					current_game_state = state_game_won; // VICTORY!
+					gameRunning = false;
+				}
+				continue; 
+			}
+		}
+
+		//  Laser vs Enemies
+		for (int j = 0; j < max_enemies; j++) {
+			if (enemies[j].active) {
+				Rectangle enemyRect = { enemies[j].x, enemies[j].y, enemies[j].width, enemies[j].height };
+				if (CheckCollisionRecs(laserRect, enemyRect)) {
+					// Collision Happened
+					lasers[i].active = false;
+					enemies[j].active = false;
+					enemies_killed++;
+					score += 100;
+					PlaySound(explosionSound);
+
+					// Spawn Explosion
+					for (int k = 0; k < max_explosions; k++) {
+						if (!explosions[k].active) {
+							explosions[k].active = true;
+							explosions[k].x = enemies[j].x;
+							explosions[k].y = enemies[j].y;
+							explosions[k].currentFrame = 0;
+							explosions[k].frameTimer = 0.0f;
+							break;
+						}
+					}
+					break; 
+				}
+			}
+		}
+	}
+
+	//  Enemy vs Player Body Collision
+	for (int j = 0; j < max_enemies; j++) {
+		if (enemies[j].active) {
+			Rectangle enemyRect = { enemies[j].x, enemies[j].y, enemies[j].width, enemies[j].height };
+			if (CheckCollisionRecs(playerRect, enemyRect)) {
+				enemies[j].active = false;
+				lives--;
+				PlaySound(explosionSound);
+				// Trigger explosion on player
+				for (int k = 0; k < max_explosions; k++) {
+					if (!explosions[k].active) {
+						explosions[k].active = true;
+						explosions[k].x = ship.x;
+						explosions[k].y = ship.y;
+						break;
+					}
+				}
+				if (lives <= 0) {
+					current_game_state = state_game_over;
+					gameRunning = false;
+				}
+			}
+		}
+	}
+
+	//  Level Progression
+	if (enemies_killed >= enemies_to_Kill && level != 11) {
+		if (!inTransition) {
+			inTransition = true;
+			transitionTimer = 3.0f;
+			level++;
+			startLevel(level); 
+
+			// If we just hit level 11, setup boss
+			if (level == 11) {
+				bigBoss.active = true;
+				bigBoss.hp = bigBoss.maxHp;
+				bigBoss.entering = true;
+				bigBoss.y = -300;
+			}
+		}
+	}
+}
+
+
+
