@@ -114,7 +114,7 @@ void handleLevelTransition(Spaceship& ship, Boss& bigBoss, Enemy enemies[], Lase
 void updateExplosions(float dt, Explosion explosions[]);
 
 
-	//----Constants 
+	// Constants 
 	const int window_height = 1000;
 	const int window_width = 1000;
 	const int star_count = 200;
@@ -123,7 +123,7 @@ void updateExplosions(float dt, Explosion explosions[]);
 	const int max_enemies = 60;
 	const int explosion_frames_number = 5;
 	const int max_explosions = 10;
-	// --- GAME STATES & TRANSITIONS --- 
+	// GAME STATES & TRANSITIONS 
 	const int state_title = 0;
 	const int state_instructions = 1;
 	const int State_paused = 2;
@@ -184,7 +184,7 @@ void updateExplosions(float dt, Explosion explosions[]);
 		int currentFrame;
 		float frameTimer;
 	};
-	// --- GLOBAL VARIABLES --- 
+	//  GLOBAL VARIABLES 
 	int score = 0, highScore = 0, level = 1, lives = 3;
 	bool gameRunning = false, inTransition = false, gameWon = false, exitGameRequest = false;
 	float transitionTimer = 0.0f, shootCooldown = 0.2f, shootTimer = 0.0f, frameWidth;
@@ -194,12 +194,12 @@ void updateExplosions(float dt, Explosion explosions[]);
 	float fadeAlpha = 0.0f;
 	bool isFading_out = false;
 	int pendingTransition = Transition_none;
-	// --- OBJECTS & ASSETS --- 
+	//  OBJECTS & ASSETS  
 	star stars[star_count];
 	Texture2D playerTexture, enemyTexture, laserTexture, explosionTexture, assistTexture,
 		bossTexture, bossLaserTexture;
 	Sound shootSound, explosionSound;
-	// --- PROTOTYPE DECLERATION --- 
+	// PROTOTYPE DECLERATION 
 	void loadAssets(void);
 	void unloadAllAssets(void);
 	void loadHighScore(void);
@@ -427,6 +427,86 @@ void updateStars(void) {
 			int brightness = GetRandomValue(150, 255);
 			stars[i].color = Color{ (unsigned char)brightness, (unsigned char)brightness, (unsigned
 			char)brightness, 255 };
+		}
+	}
+}
+
+
+
+void handleMenuInput(void) {
+	
+	if (pendingTransition != Transition_none) return;
+
+	// Pause Toggle Logic
+	if (IsKeyPressed(KEY_P) && gameRunning && current_game_state != State_paused) {
+		current_game_state = State_paused;
+		menu_selection = 0;
+		return;
+	}
+
+	//  STATE TITLE MENU 
+	if (current_game_state == state_title) {
+		if (IsKeyPressed(KEY_DOWN)) {
+			menu_selection++;
+			if (menu_selection > 2) menu_selection = 0;
+		}
+		if (IsKeyPressed(KEY_UP)) {
+			menu_selection--;
+			if (menu_selection < 0) menu_selection = 2;
+		}
+
+		if (IsKeyPressed(KEY_ENTER)) {
+			if (menu_selection == 0) {
+				pendingTransition = Transition_at_gamestart;
+				isFading_out = true;
+			}
+			else if (menu_selection == 1) {
+				pendingTransition = Transition_to_instructions;
+				isFading_out = true;
+			}
+			else if (menu_selection == 2) {
+				exitGameRequest = true;
+			}
+		}
+	}
+	//  STATE INSTRUCTIONS 
+	else if (current_game_state == state_instructions) {
+		if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE)) {
+			pendingTransition = Transition_to_title;
+			isFading_out = true;
+		}
+	}
+	//  STATE PAUSED 
+	else if (current_game_state == State_paused) {
+		if (IsKeyPressed(KEY_DOWN)) {
+			menu_selection++;
+			if (menu_selection > 2) menu_selection = 0;
+		}
+		if (IsKeyPressed(KEY_UP)) {
+			menu_selection--;
+			if (menu_selection < 0) menu_selection = 2;
+		}
+
+		if (IsKeyPressed(KEY_ENTER)) {
+			if (menu_selection == 0) {
+				pendingTransition = Transition_to_resume;
+				isFading_out = true;
+			}
+			else if (menu_selection == 1) {
+				pendingTransition = Transition_at_gamestart;
+				isFading_out = true;
+			}
+			else if (menu_selection == 2) {
+				pendingTransition = Transition_quit_to_title;
+				isFading_out = true;
+			}
+		}
+	}
+	//  STATE GAME OVER OR VICTORY 
+	else if (current_game_state == state_game_over || current_game_state == state_game_won) {
+		if (IsKeyPressed(KEY_ENTER)) {
+			pendingTransition = Transition_to_title;
+			isFading_out = true;
 		}
 	}
 }
