@@ -511,4 +511,65 @@ void handleMenuInput(void) {
 	}
 }
 
+void handlePlayerInput(Spaceship& ship, Spaceship& assistShip, Laser lasers[]) {
+	float dt = GetFrameTime();
+
+	// Movement Logic
+	if (IsKeyDown(KEY_LEFT)) ship.x -= ship.speed;
+	if (IsKeyDown(KEY_RIGHT)) ship.x += ship.speed;
+
+	// Boundary Checks (using our new window_width)
+	if (ship.x < 0) ship.x = 0;
+	if (ship.x > window_width - ship.width) ship.x = window_width - ship.width;
+
+	// Assistant Ship Logic
+	if (IsKeyPressed(KEY_H)) assistActive = !assistActive;
+
+	if (assistActive) {
+		assistShip.x = ship.x + 80;
+		assistShip.y = ship.y;
+
+		// Keep assist ship within screen bounds
+		if (assistShip.x > window_width - assistShip.width) {
+			assistShip.x = window_width - assistShip.width;
+			ship.x = assistShip.x - 80;
+		}
+	}
+
+	// Shooting Logic
+	shootTimer -= dt;
+	if (IsKeyDown(KEY_SPACE) && shootTimer <= 0.0f) {
+		bool fired = false;
+
+		// Player Laser
+		for (int i = 0; i < max_lasers; i++) {
+			if (!lasers[i].active) {
+				lasers[i].active = true;
+				lasers[i].x = ship.x + ship.width / 2 - 10;
+				lasers[i].y = ship.y;
+				fired = true;
+				break;
+			}
+		}
+
+		// Assist Laser
+		if (assistActive) {
+			for (int i = 0; i < max_lasers; i++) {
+				if (!lasers[i].active) {
+					lasers[i].active = true;
+					lasers[i].x = assistShip.x + assistShip.width / 2 - 10;
+					lasers[i].y = assistShip.y;
+					fired = true;
+					break;
+				}
+			}
+		}
+
+		if (fired) {
+			shootTimer = shootCooldown;
+			PlaySound(shootSound);
+		}
+	}
+}
+
 
