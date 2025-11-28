@@ -109,7 +109,7 @@ void resetGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enem
     lasers[], BossLaser bossLasers[]);
 void startLevel(int lvl);
 void updateStars(void);
-
+void handleMenuInput(void);
 void handlePlayerInput(Spaceship& ship, Spaceship& assistShip, Laser lasers[]);
 void updateEnemyLogic(Spaceship& ship, Enemy enemies[]);
 void updateGameLogic(float dt, Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser lasers[], BossLaser bossLasers[], Explosion explosions[]);
@@ -985,4 +985,42 @@ void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy e
 
     if (!assistActive) DrawText("[H] CALL WINGMAN", 700, 20, 20, DARKGREEN);
     else DrawText("WINGMAN ACTIVE", 700, 20, 20, GREEN);
+}void handleMenuInput(void) {
+    if (pendingTransition != Transition_none) return;
+
+    // Pause Toggle
+    if (IsKeyPressed(KEY_P) && gameRunning && current_game_state != State_paused) {
+        current_game_state = State_paused;
+        menu_selection = 0;
+        return;
+    }
+
+    // TITLE MENU 
+    if (current_game_state == state_title) {
+        if (IsKeyPressed(KEY_DOWN)) { menu_selection++; if (menu_selection > 2) menu_selection = 0; }
+        if (IsKeyPressed(KEY_UP)) { menu_selection--; if (menu_selection < 0) menu_selection = 2; }
+        if (IsKeyPressed(KEY_ENTER)) {
+            if (menu_selection == 0) { pendingTransition = Transition_at_gamestart; isFading_out = true; }
+            else if (menu_selection == 1) { pendingTransition = Transition_to_instructions; isFading_out = true; }
+            else if (menu_selection == 2) { exitGameRequest = true; }
+        }
+    }
+    // INSTRUCTIONS 
+    else if (current_game_state == state_instructions) {
+        if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE)) { pendingTransition = Transition_to_title; isFading_out = true; }
+    }
+    // PAUSED 
+    else if (current_game_state == State_paused) {
+        if (IsKeyPressed(KEY_DOWN)) { menu_selection++; if (menu_selection > 2) menu_selection = 0; }
+        if (IsKeyPressed(KEY_UP)) { menu_selection--; if (menu_selection < 0) menu_selection = 2; }
+        if (IsKeyPressed(KEY_ENTER)) {
+            if (menu_selection == 0) { pendingTransition = Transition_to_resume; isFading_out = true; }
+            else if (menu_selection == 1) { pendingTransition = Transition_at_gamestart; isFading_out = true; }
+            else if (menu_selection == 2) { pendingTransition = Transition_quit_to_title; isFading_out = true; }
+        }
+    }
+    // GAME OVER / WON 
+    else if (current_game_state == state_game_over || current_game_state == state_game_won) {
+        if (IsKeyPressed(KEY_ENTER)) { pendingTransition = Transition_to_title; isFading_out = true; }
+    }
 }
