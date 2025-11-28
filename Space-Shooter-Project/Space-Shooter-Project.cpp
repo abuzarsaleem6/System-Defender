@@ -92,6 +92,8 @@ using namespace std;
 	// --- PROTOTYPE DECLERATION --- 
 	void loadAssets(void);
 	void unloadAllAssets(void);
+	void loadHighScore(void);
+	void saveHighScore(void);
 
 int main() {
 
@@ -124,4 +126,12 @@ void unloadAllAssets(void) {
 	UnloadTexture(bossLaserTexture); 
 	UnloadSound(shootSound);
 	UnloadSound(explosionSound);
+}
+void loadHighScore(void) {
+	ifstream infile("savegame.dat");
+	if (infile.is_open()) { infile >> highScore; infile.close(); }
+}
+void saveHighScore(void) {
+	ofstream outfile("savegame.dat");
+	if (outfile.is_open()) { outfile << highScore; outfile.close(); }
 }
