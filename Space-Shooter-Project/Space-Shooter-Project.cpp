@@ -65,8 +65,8 @@ struct Boss {
 	bool active;
 	int hp;
 	int maxHp;
-	bool entering;
-	int moveDir;
+	bool entering;     
+	int moveDir;       
 	float shootTimer;
 };
 struct Explosion {
@@ -116,8 +116,7 @@ void DrawGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemi
 	lasers[], BossLaser bossLasers[], Explosion explosions[]);
 
 void DrawTransition(Spaceship& ship);
-void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser
-	lasers[], BossLaser bossLasers[], Explosion explosions[]);
+void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser lasers[], BossLaser bossLasers[], Explosion explosions[]);
 void DrawMenu(void);
 
 	
@@ -143,7 +142,7 @@ int main() {
 		stars[i].size = GetRandomValue(1, 3);
 		stars[i].color = WHITE;
 	}
-	Spaceship ship = { window_width / 2 - 30.0f, window_height - 100.0f, 60.0f, 80.0f, 9.0f};
+	Spaceship ship = { window_width / 2 - 30.0f, window_height - 100.0f, 60.0f, 80.0f, 9.0f };
 	Spaceship assistShip = { -100.0f, 0.0f, 60.0f, 80.0f, 9.0f };
 	Boss bigBoss;
 	bigBoss.width = (float)bossTexture.width > 0 ? (float)bossTexture.width : 100;
@@ -177,7 +176,7 @@ int main() {
 	for (int i = 0; i < max_lasers; i++) {
 		lasers[i].active = false; lasers[i].speed = 12.0f;
 	}
-	
+
 
 	Enemy enemies[max_enemies];
 	for (int i = 0; i < max_enemies; i++) {
@@ -216,37 +215,31 @@ int main() {
 					updateGameLogic(dt, ship, assistShip, bigBoss, enemies, lasers, bossLasers,
 						explosions);
 
-					updateStars();
-					if (score > highScore) highScore = score;
-					handleTransitions(ship, assistShip, bigBoss, enemies, lasers, bossLasers);
 
-					if (pendingTransition == Transition_none) {
-						if (!gameRunning || current_game_state == State_paused || current_game_state ==
-							state_game_over || current_game_state == state_game_won) {
-							handleMenuInput();
-						}
-						if (gameRunning && current_game_state != State_paused) {
-							if (inTransition) handleLevelTransition(ship, bigBoss, enemies, lasers);
-							else {
-								handlePlayerInput(ship, assistShip, lasers);
-								updateGameLogic(dt, ship, assistShip, bigBoss, enemies, lasers, bossLasers,
+					if (gameRunning && current_game_state != State_paused) {
+						if (inTransition) handleLevelTransition(ship, bigBoss, enemies, lasers);
+						else {
+							handlePlayerInput(ship, assistShip, lasers);
+							updateGameLogic(dt, ship, assistShip, bigBoss, enemies, lasers, bossLasers,
 
-									explosions);
-							}
+								explosions);
 						}
 					}
-					//DrawGame(ship, assistShip, bigBoss, enemies, lasers, bossLasers, explosions);
-					//if (!gameRunning && score > 0) SaveHighScore();
 				}
-
-				unloadAllAssets();
-				CloseAudioDevice();
-				CloseWindow();
-				return 0;
+				//DrawGame(ship, assistShip, bigBoss, enemies, lasers, bossLasers, explosions);
+				//if (!gameRunning && score > 0) SaveHighScore();
 			}
+
+
 		}
 	}
-}
+
+	unloadAllAssets();
+	CloseAudioDevice();
+	CloseWindow();
+	return 0;
+	}
+	
 	
 
 			void loadAssets(void) {
@@ -781,9 +774,6 @@ void updateExplosions(float dt, Explosion explosions[]) {
 	}
 }
 
-
-
-
 void DrawGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser
 	lasers[], BossLaser bossLasers[], Explosion explosions[]) {
 	BeginDrawing();
@@ -798,7 +788,10 @@ void DrawGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemi
 	if (pendingTransition != Transition_none) DrawRectangle(0, 0, window_width,
 		window_height, Fade(BLACK, fadeAlpha));
 	EndDrawing();
-}void DrawMenu(void) {
+}
+
+
+void DrawMenu(void) {
 	if (current_game_state == state_title) {
 		Rectangle rec = { window_width / 2.0f, window_height / 2.0f, 600, 500 };
 		Vector2 origin = { 300, 250 };
@@ -850,9 +843,8 @@ void DrawTransition(Spaceship& ship) {
 	DrawTexturePro(playerTexture, playerSource, playerDest, { 0,0 }, 0.0f, WHITE);
 }
 
-void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser
-	lasers[], BossLaser bossLasers[], Explosion explosions[]) {
-	// Lasers 
+void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser lasers[], BossLaser bossLasers[], Explosion explosions[]) {
+	// Lasers
 	Rectangle laserSource = { 0.0f, 0.0f, (float)laserTexture.width, (float)laserTexture.height };
 	for (int i = 0; i < max_lasers; i++) {
 		if (lasers[i].active) {
@@ -860,34 +852,84 @@ void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy e
 			DrawTexturePro(laserTexture, laserSource, laserDest, { 0,0 }, 0.0f, WHITE);
 		}
 	}
-	// Boss & Boss Lasers 
+
+	// Boss & Health Bar (NEW FEATURE)
 	if (level == 11 && bigBoss.active) {
 		Rectangle bossSource = { 0.0f, 0.0f, (float)bossTexture.width, (float)bossTexture.height };
 		Rectangle bossDest = { bigBoss.x, bigBoss.y, bigBoss.width, bigBoss.height };
-		DrawTexturePro(bossTexture, bossSource, bossDest, { 0,0 }, 0.0f, (bigBoss.hp <
-			bigBoss.maxHp && GetRandomValue(0, 10)>8) ? RED : WHITE);
-		// ... (Draw Boss Lasers and Health Bar here) 
+
+		// Flash Red when hit
+		Color bossTint = WHITE;
+		if (bigBoss.hp < bigBoss.maxHp && GetRandomValue(0, 10) > 8) bossTint = RED;
+		DrawTexturePro(bossTexture, bossSource, bossDest, { 0,0 }, 0.0f, bossTint);
+
+		// Boss Lasers (Rotated 180 degrees)
+		Rectangle bLaserSource = { 0.0f, 0.0f, (float)bossLaserTexture.width, (float)bossLaserTexture.height };
+		for (int i = 0; i < max_boss_lasers; i++) {
+			if (bossLasers[i].active) {
+				Rectangle bLaserDest = { bossLasers[i].x, bossLasers[i].y, bossLasers[i].width, bossLasers[i].height };
+				DrawTexturePro(bossLaserTexture, bLaserSource, bLaserDest, { 0,0 }, 180.0f, WHITE);
+			}
+		}
+
+		// Draw Health Bar
+		float hpPercent = (float)bigBoss.hp / (float)bigBoss.maxHp;
+		DrawRectangle(200, 50, 500, 20, GRAY);
+		DrawRectangle(200, 50, (int)(500 * hpPercent), 20, RED);
+		DrawRectangleLines(200, 50, 500, 20, WHITE);
+		DrawText("BOSS HEALTH", 400, 25, 20, RED);
 	}
-	// Enemies 
-	Rectangle enemySource = { 0.0f, 0.0f, (float)enemyTexture.width, (float)enemyTexture.height
-	};
+
+	// Enemies
+	Rectangle enemySource = { 0.0f, 0.0f, (float)enemyTexture.width, (float)enemyTexture.height };
 	for (int i = 0; i < max_enemies; i++) {
 		if (enemies[i].active) {
-			Rectangle enemyDest = { enemies[i].x, enemies[i].y, enemies[i].width, enemies[i].height
-			};
-			DrawTexturePro(enemyTexture, enemySource, enemyDest, { 0,0 }, 0.0f, (enemies[i].hp
-				< enemies[i].maxHp) ? RED : WHITE);
+			Rectangle enemyDest = { enemies[i].x, enemies[i].y, enemies[i].width, enemies[i].height };
+			// Tint Red if damaged (for hard enemies)
+			Color tint = WHITE;
+			if (enemies[i].maxHp > 1 && enemies[i].hp < enemies[i].maxHp) tint = RED;
+			DrawTexturePro(enemyTexture, enemySource, enemyDest, { 0,0 }, 0.0f, tint);
 		}
 	}
-	// Player 
-	Rectangle playerSource = { 0.0f, 0.0f, (float)playerTexture.width, (float)playerTexture.height
-	};
+
+	// Player
+	Rectangle playerSource = { 0.0f, 0.0f, (float)playerTexture.width, (float)playerTexture.height };
 	Rectangle playerDest = { ship.x, ship.y, ship.width, ship.height };
 	DrawTexturePro(playerTexture, playerSource, playerDest, { 0,0 }, 0.0f, WHITE);
 
-	// UI HUD 
+	// Assist Ship
+	if (assistActive) {
+		Rectangle assistSource = { 0.0f, 0.0f, (float)assistTexture.width, (float)assistTexture.height };
+		Rectangle assistDest = { assistShip.x, assistShip.y, assistShip.width, assistShip.height };
+		DrawTexturePro(assistTexture, assistSource, assistDest, { 0,0 }, 0.0f, WHITE);
+	}
+
+	// Explosions
+	for (int i = 0; i < max_explosions; i++) {
+		if (explosions[i].active) {
+			Rectangle explSource = { explosions[i].currentFrame * frameWidth, 0.0f, frameWidth, (float)explosionTexture.height };
+			Rectangle explDest = { explosions[i].x, explosions[i].y, 50, 50 };
+			DrawTexturePro(explosionTexture, explSource, explDest, { 0,0 }, 0.0f, WHITE);
+		}
+	}
+
+	// IMPROVED HUD (Using Code 1 variables)
 	DrawText(TextFormat("SCORE: %d", score), 20, 20, 20, GREEN);
+	DrawText(TextFormat("HIGH: %d", highScore), 20, 50, 20, GOLD);
 	DrawText(TextFormat("LIVES: %d", lives), 20, 110, 20, RED);
+
+	if (level == 11) {
+		DrawText("LEVEL: IMPOSSIBLE", 20, 80, 20, RED);
+	}
+	else {
+		DrawText(TextFormat("LEVEL: %d", level), 20, 80, 20, YELLOW);
+		int remaining = enemies_to_Kill - enemies_killed;
+		if (remaining < 0) remaining = 0;
+		DrawText(TextFormat("ENEMIES LEFT: %d", remaining), 200, 20, 20, SKYBLUE);
+	}
+
+	if (!assistActive) DrawText("[H] CALL WINGMAN", 700, 20, 20, DARKGREEN);
+	else DrawText("WINGMAN ACTIVE", 700, 20, 20, GREEN);
 }
 
 
