@@ -114,7 +114,7 @@ void handlePlayerInput(Spaceship& ship, Spaceship& assistShip, Laser lasers[]);
 void updateEnemyLogic(Spaceship& ship, Enemy enemies[]);
 void updateGameLogic(float dt, Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser lasers[], BossLaser bossLasers[], Explosion explosions[]);
 void handleTransitions(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser lasers[], BossLaser bossLasers[]);
-
+// Purani line ko is se replace karein:
 void handleLevelTransition(Spaceship& ship, Boss& bigBoss, Enemy enemies[], Laser lasers[], BossLaser bossLasers[], Explosion explosions[]);
 void updateExplosions(float dt, Explosion explosions[]);
 void DrawGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser
@@ -123,7 +123,6 @@ void DrawGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemi
 void DrawTransition(Spaceship& ship);
 void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser lasers[], BossLaser bossLasers[], Explosion explosions[]);
 void DrawMenu(void);
-
 
 // Helper function to spawn explosion
 void SpawnExplosion(float x, float y, Explosion explosions[]) {
@@ -214,10 +213,10 @@ int main() {
                 state_game_over || current_game_state == state_game_won) {
                 handleMenuInput();
             }
-           
+            // Main loop ke andar is part ko dhoonden aur replace karein:
             if (gameRunning && current_game_state != State_paused) {
                 if (inTransition) {
-                    
+                    // Yahan naya function call ayega:
                     handleLevelTransition(ship, bigBoss, enemies, lasers, bossLasers, explosions);
                 }
                 else {
@@ -234,7 +233,7 @@ int main() {
     CloseAudioDevice();
     CloseWindow();
     return 0;
-} 
+}
 
 
 void loadAssets(void) {
@@ -314,63 +313,81 @@ void updateStars(void) {
 }
 
 
-void handlePlayerInput(Spaceship& ship, Spaceship& assistShip, Laser lasers[]) {
-    float dt = GetFrameTime();
 
-    // Movement Logic
-    if (IsKeyDown(KEY_LEFT)) ship.x -= ship.speed;
-    if (IsKeyDown(KEY_RIGHT)) ship.x += ship.speed;
+void handleMenuInput(void) {
 
-    // Boundary Checks (using our new window_width)
-    if (ship.x < 0) ship.x = 0;
-    if (ship.x > window_width - ship.width) ship.x = window_width - ship.width;
+    if (pendingTransition != Transition_none) return;
 
-    // Assistant Ship Logic
-    if (IsKeyPressed(KEY_H)) assistActive = !assistActive;
-
-    if (assistActive) {
-        assistShip.x = ship.x + 80;
-        assistShip.y = ship.y;
-
-        // Keep assist ship within screen bounds
-        if (assistShip.x > window_width - assistShip.width) {
-            assistShip.x = window_width - assistShip.width;
-            ship.x = assistShip.x - 80;
-        }
+    // Pause Toggle Logic
+    if (IsKeyPressed(KEY_P) && gameRunning && current_game_state != State_paused) {
+        current_game_state = State_paused;
+        menu_selection = 0;
+        return;
     }
 
-    // Shooting Logic
-    shootTimer -= dt;
-    if (IsKeyDown(KEY_SPACE) && shootTimer <= 0.0f) {
-        bool fired = false;
-
-        // Player Laser
-        for (int i = 0; i < max_lasers; i++) {
-            if (!lasers[i].active) {
-                lasers[i].active = true;
-                lasers[i].x = ship.x + ship.width / 2 - 10;
-                lasers[i].y = ship.y;
-                fired = true;
-                break;
-            }
+    //  STATE TITLE MENU 
+    if (current_game_state == state_title) {
+        if (IsKeyPressed(KEY_DOWN)) {
+            menu_selection++;
+            if (menu_selection > 2) menu_selection = 0;
+        }
+        if (IsKeyPressed(KEY_UP)) {
+            menu_selection--;
+            if (menu_selection < 0) menu_selection = 2;
         }
 
-        // Assist Laser
-        if (assistActive) {
-            for (int i = 0; i < max_lasers; i++) {
-                if (!lasers[i].active) {
-                    lasers[i].active = true;
-                    lasers[i].x = assistShip.x + assistShip.width / 2 - 10;
-                    lasers[i].y = assistShip.y;
-                    fired = true;
-                    break;
-                }
+        if (IsKeyPressed(KEY_ENTER)) {
+            if (menu_selection == 0) {
+                pendingTransition = Transition_at_gamestart;
+                isFading_out = true;
+            }
+            else if (menu_selection == 1) {
+                pendingTransition = Transition_to_instructions;
+                isFading_out = true;
+            }
+            else if (menu_selection == 2) {
+                exitGameRequest = true;
             }
         }
+    }
+    //  STATE INSTRUCTIONS 
+    else if (current_game_state == state_instructions) {
+        if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE)) {
+            pendingTransition = Transition_to_title;
+            isFading_out = true;
+        }
+    }
+    //  STATE PAUSED 
+    else if (current_game_state == State_paused) {
+        if (IsKeyPressed(KEY_DOWN)) {
+            menu_selection++;
+            if (menu_selection > 2) menu_selection = 0;
+        }
+        if (IsKeyPressed(KEY_UP)) {
+            menu_selection--;
+            if (menu_selection < 0) menu_selection = 2;
+        }
 
-        if (fired) {
-            shootTimer = shootCooldown;
-            PlaySound(shootSound);
+        if (IsKeyPressed(KEY_ENTER)) {
+            if (menu_selection == 0) {
+                pendingTransition = Transition_to_resume;
+                isFading_out = true;
+            }
+            else if (menu_selection == 1) {
+                pendingTransition = Transition_at_gamestart;
+                isFading_out = true;
+            }
+            else if (menu_selection == 2) {
+                pendingTransition = Transition_quit_to_title;
+                isFading_out = true;
+            }
+        }
+    }
+    //  STATE GAME OVER OR VICTORY 
+    else if (current_game_state == state_game_over || current_game_state == state_game_won) {
+        if (IsKeyPressed(KEY_ENTER)) {
+            pendingTransition = Transition_to_title;
+            isFading_out = true;
         }
     }
 }
@@ -468,7 +485,7 @@ void handleTransitions(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, En
                 gameRunning = false;
                 break;
 
-                
+                // Corrected variable name as requested
             case Transition_to_resume:
                 break;
 
@@ -598,23 +615,27 @@ void updateGameLogic(float dt, Spaceship& ship, Spaceship& assistShip, Boss& big
         }
 
         //  Laser vs Enemies
+        //  Laser vs Enemies
         for (int j = 0; j < max_enemies; j++) {
             if (enemies[j].active) {
                 Rectangle enemyRect = { enemies[j].x, enemies[j].y, enemies[j].width, enemies[j].height };
+
                 if (CheckCollisionRecs(laserRect, enemyRect)) {
                     // Collision Happened
-                    lasers[i].active = false;
-                    enemies[j].active = false;
-                    enemies_killed++;
+                    lasers[i].active = false; // Laser khatam
 
-                    // --- SCORE IS 10 (KEPT) ---
-                    score += 10;
-                    // --------------------------------
+                    enemies[j].hp--; // <--- YEH CHANGE HAI (HP kam karein)
 
-                    PlaySound(explosionSound);
+                    PlaySound(explosionSound); // Sound har hit pe bajayen
 
-                    // Spawn Explosion
-                    SpawnExplosion(enemies[j].x, enemies[j].y, explosions);
+                    // Ab check karein ke kya Enemy mar gaya?
+                    if (enemies[j].hp <= 0) {
+                        enemies[j].active = false;
+                        enemies_killed++;
+                        score += 10;
+                        SpawnExplosion(enemies[j].x, enemies[j].y, explosions);
+                    }
+
                     break;
                 }
             }
@@ -662,7 +683,7 @@ void updateGameLogic(float dt, Spaceship& ship, Spaceship& assistShip, Boss& big
 
 
 void updateEnemyLogic(Spaceship& ship, Enemy enemies[]) {
-    
+    // Code 2 Logic adapted for Code 1 Variables
     int max_enemies_on_screen = (level == 11) ? 0 : (5 + level * 2);
     if (max_enemies_on_screen > max_enemies) max_enemies_on_screen = max_enemies;
 
@@ -681,7 +702,11 @@ void updateEnemyLogic(Spaceship& ship, Enemy enemies[]) {
 
                     // Speed increases slightly every level
                     enemies[i].speed = 1.0f + ((level - 1) * 0.1f);
-               
+
+                    // Level 7+ enemies have 2 HP (Harder)
+                    if (level <= 6) { enemies[i].hp = 1; enemies[i].maxHp = 1; }
+                    else { enemies[i].hp = 2; enemies[i].maxHp = 2; }
+
                     enemies_spawned_count++;
                     if (enemies_spawned_count >= enemies_to_Kill) break;
                 }
@@ -720,6 +745,7 @@ void updateEnemyLogic(Spaceship& ship, Enemy enemies[]) {
     }
 }
 
+// Is pooray function ko copy paste kar lein:
 void handleLevelTransition(Spaceship& ship, Boss& bigBoss, Enemy enemies[], Laser lasers[], BossLaser bossLasers[], Explosion explosions[]) {
     float dt = GetFrameTime();
     transitionTimer -= dt;
@@ -731,22 +757,23 @@ void handleLevelTransition(Spaceship& ship, Boss& bigBoss, Enemy enemies[], Lase
     if (ship.x < targetX) ship.x += 2.0f;
     if (ship.x > targetX) ship.x -= 2.0f;
 
-    
+    // Jab transition timer 0 ho jaye (Level start hone wala ho)
     if (transitionTimer <= 0.0f) {
         inTransition = false;
 
-        
+        // --- NEW FIX: CLEANUP OBJECTS ---
+        // Sabhi lasers ko gayab karein
         for (int i = 0; i < max_lasers; i++) lasers[i].active = false;
 
-       
+        // Sabhi boss lasers ko gayab karein
         for (int i = 0; i < max_boss_lasers; i++) bossLasers[i].active = false;
 
-        
+        // Sabhi explosions ko gayab karein
         for (int i = 0; i < max_explosions; i++) {
             explosions[i].active = false;
-            explosions[i].currentFrame = 0; 
+            explosions[i].currentFrame = 0; // Frame bhi reset karein
         }
-      
+        // --------------------------------
 
         shootTimer = 0.5f;
 
@@ -759,6 +786,7 @@ void handleLevelTransition(Spaceship& ship, Boss& bigBoss, Enemy enemies[], Lase
         }
     }
 }
+
 
 
 void updateExplosions(float dt, Explosion explosions[]) {
@@ -782,8 +810,6 @@ void updateExplosions(float dt, Explosion explosions[]) {
 
 
 
-
-
 void DrawGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser
     lasers[], BossLaser bossLasers[], Explosion explosions[]) {
     BeginDrawing();
@@ -798,10 +824,7 @@ void DrawGame(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemi
     if (pendingTransition != Transition_none) DrawRectangle(0, 0, window_width,
         window_height, Fade(BLACK, fadeAlpha));
     EndDrawing();
-}
-
-
-void DrawMenu(void) {
+}void DrawMenu(void) {
     if (current_game_state == state_title) {
         Rectangle rec = { window_width / 2.0f, window_height / 2.0f, 600, 500 };
         Vector2 origin = { 300, 250 };
@@ -821,10 +844,10 @@ void DrawMenu(void) {
         DrawText(TextFormat("STATS (HIGH: %d)", highScore), window_width / 2 - 150, startY +
             spacing * 2, 30, GRAY);
 
-       
-        Color c2 = (menu_selection == 2) ? GREEN : MAGENTA; 
+        // Corrected Quit Game Logic (Menu Selection Fix)
+        Color c2 = (menu_selection == 2) ? GREEN : MAGENTA; // Fixed: replaced window_width with menu_selection
         DrawText("QUIT GAME", window_width / 2 - 150, startY + spacing * 3, 30, c2);
-        if (menu_selection == 2) DrawText(">", window_width / 2 - 180, startY + spacing * 3, 30, GREEN); 
+        if (menu_selection == 2) DrawText(">", window_width / 2 - 180, startY + spacing * 3, 30, GREEN); // Fixed here too
 
         DrawText("Use UP/DOWN Arrows to Move, ENTER to Select", 250, 800, 20, LIGHTGRAY);
     }
@@ -842,7 +865,7 @@ void DrawMenu(void) {
         DrawText("GOALS:", 150, 480, 20, YELLOW);
         DrawText("  - Destroy enemies to increase SCORE and advance LEVELS.", 150, 510, 20, WHITE);
         DrawText("  - Survive 10 levels to face the IMPOSSIBLE BOSS.", 150, 540, 20, WHITE);
-        DrawText("  - Enemies in Level 7+ require 2 HITS to destroy!", 150, 570, 20, RED);
+
 
         DrawText("Press [ENTER] to return", 150, 720, 20, GREEN);
     }
@@ -881,7 +904,6 @@ void DrawMenu(void) {
         DrawText("PRESS [ENTER] TO RETURN TO TITLE", 250, 600, 20, DARKGRAY);
     }
 }
-
 void DrawTransition(Spaceship& ship) {
     if (level == 11) {
         DrawText("WARNING!", 350, 250, 50, RED);
@@ -896,7 +918,6 @@ void DrawTransition(Spaceship& ship) {
     Rectangle playerDest = { ship.x, ship.y, ship.width, ship.height };
     DrawTexturePro(playerTexture, playerSource, playerDest, { 0,0 }, 0.0f, WHITE);
 }
-
 
 void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy enemies[], Laser lasers[], BossLaser bossLasers[], Explosion explosions[]) {
     // Lasers
@@ -940,7 +961,7 @@ void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy e
     for (int i = 0; i < max_enemies; i++) {
         if (enemies[i].active) {
             Rectangle enemyDest = { enemies[i].x, enemies[i].y, enemies[i].width, enemies[i].height };
-            
+            // Tint Red if damaged (for hard enemies)
             Color tint = WHITE;
             if (enemies[i].maxHp > 1 && enemies[i].hp < enemies[i].maxHp) tint = RED;
             DrawTexturePro(enemyTexture, enemySource, enemyDest, { 0,0 }, 0.0f, tint);
@@ -985,42 +1006,4 @@ void DrawGameplay(Spaceship& ship, Spaceship& assistShip, Boss& bigBoss, Enemy e
 
     if (!assistActive) DrawText("[H] CALL WINGMAN", 700, 20, 20, DARKGREEN);
     else DrawText("WINGMAN ACTIVE", 700, 20, 20, GREEN);
-}void handleMenuInput(void) {
-    if (pendingTransition != Transition_none) return;
-
-    // Pause Toggle
-    if (IsKeyPressed(KEY_P) && gameRunning && current_game_state != State_paused) {
-        current_game_state = State_paused;
-        menu_selection = 0;
-        return;
-    }
-
-    // TITLE MENU 
-    if (current_game_state == state_title) {
-        if (IsKeyPressed(KEY_DOWN)) { menu_selection++; if (menu_selection > 2) menu_selection = 0; }
-        if (IsKeyPressed(KEY_UP)) { menu_selection--; if (menu_selection < 0) menu_selection = 2; }
-        if (IsKeyPressed(KEY_ENTER)) {
-            if (menu_selection == 0) { pendingTransition = Transition_at_gamestart; isFading_out = true; }
-            else if (menu_selection == 1) { pendingTransition = Transition_to_instructions; isFading_out = true; }
-            else if (menu_selection == 2) { exitGameRequest = true; }
-        }
-    }
-    // INSTRUCTIONS 
-    else if (current_game_state == state_instructions) {
-        if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE)) { pendingTransition = Transition_to_title; isFading_out = true; }
-    }
-    // PAUSED 
-    else if (current_game_state == State_paused) {
-        if (IsKeyPressed(KEY_DOWN)) { menu_selection++; if (menu_selection > 2) menu_selection = 0; }
-        if (IsKeyPressed(KEY_UP)) { menu_selection--; if (menu_selection < 0) menu_selection = 2; }
-        if (IsKeyPressed(KEY_ENTER)) {
-            if (menu_selection == 0) { pendingTransition = Transition_to_resume; isFading_out = true; }
-            else if (menu_selection == 1) { pendingTransition = Transition_at_gamestart; isFading_out = true; }
-            else if (menu_selection == 2) { pendingTransition = Transition_quit_to_title; isFading_out = true; }
-        }
-    }
-    // GAME OVER / WON 
-    else if (current_game_state == state_game_over || current_game_state == state_game_won) {
-        if (IsKeyPressed(KEY_ENTER)) { pendingTransition = Transition_to_title; isFading_out = true; }
-    }
 }
